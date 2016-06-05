@@ -33,10 +33,10 @@ class FTDI_USB:
 
     # -----------------------------------------------------------Read()
     def read(self, data, len):
-        bytes = self.device.read_data_bytes(data,10)
+        bytes = self.device.read_data_bytes(data, 10)
         time.sleep(0.5)
-        print bytes
-        print bytes == data
+        print bytes     # testing
+        print bytes == data     # testing
 
         # ------------------------------------------------------------Write()
 
