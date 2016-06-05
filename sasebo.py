@@ -18,8 +18,8 @@ class SASEBO:
         self.MODE_ENC = 0x0000
         self.MODE_DEC = 0x0001
 
-        idVendor = 0x093a
-        idProduct = 0x2510
+        idVendor = 0x0403
+        idProduct = 0x6001
         self.port = FT245RL.FTDI_USB(idVendor, idProduct)  #
         # device with idVendor =
         # 0x0403, idProduct = 0x6001
@@ -64,7 +64,7 @@ class SASEBO:
             buf[i * 3 + 1] = (((addr + i * 2) >> 8) & 0xFF)
             buf[i * 3 + 2] = (((addr + i * 2)) & 0xFF)
         print binascii.hexlify(buf).upper()
-       # self.port.write(buf, 3*(len / 2))
+        self.port.write(buf, 3*(len / 2))
         self.port.read(data,len)
     # -------------------------------------------------------------readText()
     def readText(self, text, len):
@@ -77,7 +77,7 @@ class SASEBO:
 sasebo = SASEBO()
 write = sasebo.write(0x00C, 45)
 print binascii.hexlify(write).upper()
-text_out = array.array('B',[0] * 4)
+text_out = array.array('B',[0] * 16)
 sasebo.open()
-sasebo.readText(text_out,4)
-sasebo.close()
+sasebo.readText(text_out,16)
+

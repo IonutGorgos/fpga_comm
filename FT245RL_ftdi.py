@@ -9,16 +9,21 @@ import time
 import usb
 import pylibftdi.device
 import pylibftdi.driver
+import pyftdi.ftdi
+import pyftdi.bits
+import pyftdi.spi
+import pyftdi.usbtools
 
 
 class FTDI_USB:
     def __init__(self):
-        self.device = pylibftdi.device.Device()
+        #self.device = pylibftdi.device.Device()
+        self.device = pyftdi.ftdi.Ftdi()
 
 
 
     def open(self):
-        self.device.open()
+        self.device.open(vendor = 0x0403,product= 0x6001,interface = 0)
 
 
     # -----------------------------------------------------------Close()
@@ -28,13 +33,16 @@ class FTDI_USB:
 
     # -----------------------------------------------------------Read()
     def read(self, data, len):
-        bytes = self.device.read(data)
-        return bytes
+        bytes = self.device.read_data_bytes(data,10)
+        time.sleep(0.5)
+        print bytes
+        print bytes == data
 
         # ------------------------------------------------------------Write()
 
     def write(self, data, len):
-        self.device.write(data)
+        self.device.write_data(data)
+        time.sleep(0.5)
 
 
 

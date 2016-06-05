@@ -2,6 +2,7 @@ import usb.core
 import usb.util
 import usb.control
 import usb.backend
+import usb.legacy
 import os
 import sys
 import time
@@ -18,7 +19,7 @@ class FTDI_USB:
             sys.exit("Connect the cable!")
 
     def open(self):
-        if self.device.is_kernel_driver_active(0):   # for I\O operations
+        if self.device.is_kernel_driver_active(0):  # for I\O operations
             try:
                 self.device.detach_kernel_driver(0)
             except usb.core.USBError as e:
@@ -29,38 +30,28 @@ class FTDI_USB:
         except usb.core.USBError as e:
             sys.exit("Could not set configuration: %s" % str(e))
         self.endpoint = self.device[0][(0, 0)][0]
-        #print endpoint.wMaxPacketSize
-        #print self.device
-    #-----------------------------------------------------------Close()
+        # print endpoint.wMaxPacketSize
+        # print self.device
+
+    # -----------------------------------------------------------Close()
     def close(self):
         self.device.attach_kernel_driver(0)
-    #-----------------------------------------------------------Read()
+
+    # -----------------------------------------------------------Read()
     def read(self, data, len):
         timeout = 500
-        rlen = 0
-        now = time.time()
-        while (rlen < len):
-            try:
-                d = self.device.read(self.endpoint.bEndpointAddress,
-                                   data, timeout)
-                print d
-            except usb.core.USBError as e:
-                if e.args == ('Operation timed out',):
-                    print "timeoutas"
-                    continue
-    #------------------------------------------------------------Write()
+        d = self.device.read(self.endpoint.bEndpointAddress,
+                             data, timeout)
+        print d
+        # ------------------------------------------------------------Write()
+
     def write(self, data, len):
+
         wlen = 0
         timeout = 500
-        while(True):
-            d = self.device.write(self.endpoint.bEndpointAddress, data)
-            print d
-
-
-
-
-
-
+        #while (True):
+        d = self.device.write(self.endpoint.bEndpointAddress, data)
+        print d
 
 
 '''

@@ -53,7 +53,7 @@ class SASEBO:
         buf[0] = 0x00
         buf[1] = ((addr >> 8) & 0xFF)
         buf[2] = ((addr) & 0xFF)
-        port.write(buf, 3)
+        self.port.write(buf, 3)
         self.port.read(buf,2)
         return (buf[0] << 8) + buf[1]
     # --------------------------------------------------------------readBurst()
@@ -63,11 +63,13 @@ class SASEBO:
             buf[i * 3 + 0] = 0x00
             buf[i * 3 + 1] = (((addr + i * 2) >> 8) & 0xFF)
             buf[i * 3 + 2] = (((addr + i * 2)) & 0xFF)
-        print binascii.hexlify(buf).upper()
+        print binascii.b2a_hex(buf).upper()
+        print binascii.b2a_hex(data).upper()
         self.port.write(buf, 3*(len / 2))
         self.port.read(data,len)
     # -------------------------------------------------------------readText()
     def readText(self, text, len):
+        #print text
         self.readBurst(self.ADDR_OTEXT0,text,len)
 
 
@@ -77,8 +79,8 @@ class SASEBO:
 sasebo = SASEBO()
 #write = sasebo.write(0x00C, 45)
 #print binascii.hexlify(write).upper()
-text_out = array.array('B',[0] * 16).tostring()
+text_out = array.array('B',[0] * 16)
 sasebo.open()
-print sasebo.port.read(text_out,16)
+sasebo.readText(text_out, 16)
 sasebo.close()
 
