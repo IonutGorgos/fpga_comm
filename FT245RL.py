@@ -37,7 +37,25 @@ class FTDI_USB:
     #-----------------------------------------------------------Read()
     def read(self, data, len):
         timeout = 500
-        self.device.read(self.endpoint.bEndpointAddress, data, timeout)
+        rlen = 0
+        now = time.time()
+        while (rlen < len):
+            try:
+                d = self.device.read(self.endpoint.bEndpointAddress,
+                                   data, timeout)
+                print d
+            except usb.core.USBError as e:
+                if e.args == ('Operation timed out',):
+                    print "timeoutas"
+                    continue
+    #------------------------------------------------------------Write()
+    def write(self, data, len):
+        wlen = 0
+        timeout = 500
+        while(True):
+            d = self.device.write(self.endpoint.bEndpointAddress, data)
+            print d
+
 
 
 
