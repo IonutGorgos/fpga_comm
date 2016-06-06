@@ -25,6 +25,21 @@ text_out = bytearray(16)
 
 hw.writeText(text_in, 16)
 hw.execute()
-print "Cipher text(Hardware) : ",
-hw.readText(text_out, 16)
+bytes = hw.readText(text_out, 16)
+print "Cipher text(Hardware) : ",  binascii.hexlify(bytes).upper()
+
+while 1:
+    text_in = rand.read(16)
+    print "Plain text            : ", binascii.hexlify(text_in).upper()
+
+    text_ans = sw.encrypt(text_in)
+    print "Cipher text(Software) : ", binascii.hexlify(text_ans).upper()
+
+    text_out = bytearray(16)
+
+    hw.writeText(text_in, 16)
+    hw.execute()
+    bytes = hw.readText(text_out, 16)
+    print "Cipher text(Hardware) : ",  binascii.hexlify(bytes).upper()
+
 hw.close()

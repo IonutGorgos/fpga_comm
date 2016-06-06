@@ -34,7 +34,8 @@ class FTDI_USB:
     # -------------------------------------------------------------------Read()
     def read(self, data, len):
         bytes = self.device.read_data(data)
-        print binascii.hexlify(bytes).upper()     # testing
+        #print binascii.hexlify(bytes).upper()     # testing
+        return bytes
 
     # ------------------------------------------------------------------Write()
     def write(self, data, len):

@@ -63,7 +63,8 @@ class SASEBO:
 
     # -------------------------------------------------------------- readText()
     def readText(self, text, len):
-        self.readBurst(self.ADDR_OTEXT0, text, len)
+        #self.readBurst(self.ADDR_OTEXT0, text, len)
+        return self.readBurst(self.ADDR_OTEXT0, text, len)
 
     # ----------------------------------------------------------------execute()
     def execute(self):
@@ -118,4 +119,5 @@ class SASEBO:
         #print binascii.b2a_hex(buf).upper()  # testing
         #print binascii.b2a_hex(data).upper()  # testing
         self.port.write(buf, 3 * (len / 2))
-        self.port.read(data, len)
+        #self.port.read(data, len)
+        return self.port.read(data, len)
