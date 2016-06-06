@@ -74,8 +74,8 @@ class SASEBO:
 
     # ----------------------------------------------------------------- write()
     def write(self, addr, data):  # write function from SASEBO
-        # buf = bytearray(5)
-        buf = array.array('B', [0] * 5)
+        buf = bytearray(5)
+        #buf = array.array('B', [0] * 5)
         buf[0] = 0x01
         buf[1] = ((addr >> 8) & 0xFF)
         buf[2] = ((addr) & 0xFF)
@@ -86,7 +86,8 @@ class SASEBO:
 
     # ------------------------------------------------------------------ read()
     def read(self, addr):
-        buf = array.array('B', [0] * 3)
+       #buf = array.array('B', [0] * 3)
+        buf = bytearray(3)
         buf[0] = 0x00
         buf[1] = ((addr >> 8) & 0xFF)
         buf[2] = ((addr) & 0xFF)
@@ -95,35 +96,26 @@ class SASEBO:
         return (buf[0] << 8) + buf[1]
 
     def writeBurst(self, addr, data, len):
-        buf = array.array('B', [0] * (5 * len / 2))
+        #buf = array.array('B', [0] * (5 * len / 2))
+        buf = bytearray(5 * len / 2)
         for i in range(len / 2):
             buf[i * 5 + 0] = 0x01
             buf[i * 5 + 1] = (((addr + i * 2) >> 8) & 0xFF)
             buf[i * 5 + 2] = (((addr + i * 2)) & 0xFF)
             buf[i * 5 + 3] = data[i * 2]
             buf[i * 5 + 4] = data[i * 2 + 1]
+        #print binascii.hexlify(data).upper()  # testing
         self.port.write(buf, 5 * (len / 2))
 
     # ------------------------------------------------------------- readBurst()
     def readBurst(self, addr, data, len):
-        buf = array.array('B', [0] * (3 * len / 2))
+        #buf = array.array('B', [0] * (3 * len / 2))
+        buf = bytearray(3 * len / 2)
         for i in range(len / 2):
             buf[i * 3 + 0] = 0x00
             buf[i * 3 + 1] = (((addr + i * 2) >> 8) & 0xFF)
             buf[i * 3 + 2] = (((addr + i * 2)) & 0xFF)
         print binascii.b2a_hex(buf).upper()  # testing
-        print binascii.b2a_hex(data).upper()  # testing
+        #print binascii.b2a_hex(data).upper()  # testing
         self.port.write(buf, 3 * (len / 2))
         self.port.read(data, len)
-
-
-# testing purpose
-
-sasebo = SASEBO()
-# write = sasebo.write(0x00C, 45)
-# print binascii.hexlify(write).upper()
-text_out = array.array('B', [0] * 16)
-sasebo.open()
-sasebo.setEnc()
-sasebo.readText(text_out, 16)
-sasebo.close()

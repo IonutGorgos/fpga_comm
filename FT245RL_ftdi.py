@@ -13,7 +13,7 @@ import pyftdi.ftdi
 import pyftdi.bits
 import pyftdi.spi
 import pyftdi.usbtools
-
+import binascii
 
 class FTDI_USB:
     def __init__(self):
@@ -35,8 +35,9 @@ class FTDI_USB:
     def read(self, data, len):
         bytes = self.device.read_data_bytes(data, 10)
         time.sleep(0.5)
-        print bytes     # testing
-        print bytes == data     # testing
+        print binascii.hexlify(data)
+        print binascii.hexlify(bytes)     # testing
+        print bytes.tostring() == data     # testing
 
         # ------------------------------------------------------------Write()
 
