@@ -81,8 +81,8 @@ class SASEBO:
         buf[2] = ((addr) & 0xFF)
         buf[3] = ((data >> 8) & 0xFF)
         buf[4] = ((data) & 0xFF)
-        return buf  # for testing purpose
-        # port.write(buf,5)   # write function from FTDI
+        self.port.write(buf, 5)
+        #return buf  # for testing purpose
 
     # ------------------------------------------------------------------ read()
     def read(self, addr):
