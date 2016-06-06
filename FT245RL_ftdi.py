@@ -26,24 +26,20 @@ class FTDI_USB:
         self.device.open(vendor = 0x0403,product= 0x6001,interface = 0)
 
 
-    # -----------------------------------------------------------Close()
+    # ------------------------------------------------------------------Close()
     def close(self):
         self.device.close()
 
 
-    # -----------------------------------------------------------Read()
+    # -------------------------------------------------------------------Read()
     def read(self, data, len):
-        bytes = self.device.read_data_bytes(data, 10)
-        time.sleep(0.5)
-        print binascii.hexlify(data)
+        bytes = self.device.read_data(data)
         print binascii.hexlify(bytes)     # testing
-        print bytes.tostring() == data     # testing
 
-        # ------------------------------------------------------------Write()
-
+    # ------------------------------------------------------------------Write()
     def write(self, data, len):
         self.device.write_data(data)
-        time.sleep(0.5)
+        #time.sleep(0.5)
 
 
 

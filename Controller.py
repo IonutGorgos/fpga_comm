@@ -1,17 +1,29 @@
 import sasebo_ftdi
-import random
 import binascii
+from Crypto import Random
+from Crypto.Cipher import AES
 
 hw = sasebo_ftdi.SASEBO()
-# write = sasebo.write(0x00C, 45)
-# print binascii.hexlify(write).upper()
-rand = random.Random()
-key = bytearray(rand.getrandbits(8) for _ in xrange(16))
-print binascii.hexlify(key)
-text_in = bytearray(rand.getrandbits(8) for _ in xrange(16))
-print binascii.hexlify(text_in)
-text_out = bytearray(16)
 hw.open()
+rand = Random.new()
+
+#key = bytearray(rand.getrandbits(8) for _ in xrange(16))
+key = rand.read(16)
+print "Key                   : " , binascii.hexlify(key)
+
+hw.setKey(key,16)
+sw = AES.new(key, AES.MODE_ECB)
+
+#text_in = bytearray(rand.getrandbits(8) for _ in xrange(16))
+text_in = rand.read(16)
+print "Plain text            : ", binascii.hexlify(text_in)
+
+text_ans = sw.encrypt(text_in)
+print "Cipher text(Software) : ", binascii.hexlify(text_ans)
+
+text_out = bytearray(16)
+
 hw.writeText(text_in, 16)
 hw.execute()
-hw.readText(text_out, 16)
+print "Cipher text(Hardware) : ", hw.readText(text_out, 16)
+hw.close()

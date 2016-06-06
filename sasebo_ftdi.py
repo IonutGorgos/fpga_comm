@@ -46,8 +46,8 @@ class SASEBO:
     def setKey(self, key, len):
         self.writeBurst(self.ADDR_KEY0, key, len)
         self.write(self.ADDR_CONT, 0x0002)  # Execute key generation
-        while self.read(self.ADDR_CONT) != 0:
-            pass
+        #while self.read(self.ADDR_CONT) != 0:
+            #pass
 
     # ---------------------------------------------------------------- setEnc()
     def setEnc(self):
@@ -63,14 +63,13 @@ class SASEBO:
 
     # -------------------------------------------------------------- readText()
     def readText(self, text, len):
-        # print text
         self.readBurst(self.ADDR_OTEXT0, text, len)
 
     # ----------------------------------------------------------------execute()
     def execute(self):
         self.write(self.ADDR_CONT, 0x0001)  # Execute cipher processing
-        while self.read(self.ADDR_CONT) != 0:
-            pass
+     #   while self.read(self.ADDR_CONT) != 0:
+          #  pass
 
     # ----------------------------------------------------------------- write()
     def write(self, addr, data):  # write function from SASEBO
@@ -93,6 +92,7 @@ class SASEBO:
         buf[2] = ((addr) & 0xFF)
         self.port.write(buf, 3)
         self.port.read(buf, 2)
+       #print  (buf[0] << 8) + buf[1]
         return (buf[0] << 8) + buf[1]
 
     def writeBurst(self, addr, data, len):
@@ -115,7 +115,7 @@ class SASEBO:
             buf[i * 3 + 0] = 0x00
             buf[i * 3 + 1] = (((addr + i * 2) >> 8) & 0xFF)
             buf[i * 3 + 2] = (((addr + i * 2)) & 0xFF)
-        print binascii.b2a_hex(buf).upper()  # testing
+        #print binascii.b2a_hex(buf).upper()  # testing
         #print binascii.b2a_hex(data).upper()  # testing
         self.port.write(buf, 3 * (len / 2))
         self.port.read(data, len)
