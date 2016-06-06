@@ -1,3 +1,9 @@
+#!/usr/bin/env python
+"""Sasebo_ftdi.py: Class for Sasebo-G device."""
+
+__author__ = 'Ionut Gorgos'
+__copyright__ = 'Copyright (c) 2016 Ionut Gorgos'
+
 import binascii
 import FT245RL_ftdi
 import array
@@ -15,14 +21,14 @@ class SASEBO:
         self.ADDR_OTEXT0 = 0x0180
         self.ADDR_VERSION = 0xFFFC
 
+        # Cipher Mode
         self.MODE_ENC = 0x0000
         self.MODE_DEC = 0x0001
 
         # idVendor = 0x0403
         # idProduct = 0x6001
-        self.port = FT245RL_ftdi.FTDI_USB()  #
-        # device with idVendor =
-        # 0x0403, idProduct = 0x6001
+        self.port = FT245RL_ftdi.FTDI_USB()  # device with idVendor =0x0403,
+                                                        # idProduct = 0x6001
 
     # ------------------------------------------------------------------ open()
     def open(self):
