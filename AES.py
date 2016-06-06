@@ -1,20 +1,30 @@
-'''
 import pyftdi.ftdi
-import array
+import pyftdi.bits
+import pyftdi.spi
+import pyftdi.usbtools
+import pyftdi.gpio
 import binascii
 
-dev = pyftdi.ftdi.Ftdi()
-dev.open(vendor = 0x0403,product= 0x6001,interface = 0)
-text_out = array.array('B',[4] * 16)
-dev.write_data(text_out)
-print binascii.hexlify(dev.read_data(16))
-dev.close()
-'''
+class GPIO:
+    def __init__(self):
+        #self.device = pylibftdi.device.Device()
+        self.device = pyftdi.gpio.GpioController()
 
-import pylibftdi.device
-import binascii
-import array
-de = pylibftdi.device.Device()
-#print de
-a = de.read(16)
-print binascii.hexlify(a)
+
+
+    def open(self):
+        self.device.open(vendor = 0x0403,product= 0x6001,interface = 0, direction=0)
+
+
+    # ------------------------------------------------------------------Close()
+    def close(self):
+        self.device.close()
+
+    def read_pins(self):
+        self.device.read_port()
+
+
+a = GPIO()
+a.open()
+b = a.read_pins()
+print b
