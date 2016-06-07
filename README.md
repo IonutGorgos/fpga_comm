@@ -1,6 +1,6 @@
 A command line script to encrypt data to SASEBO G written in Python 2.7
 
-Libusb-win32 used for Windows
+Libusb-win32 driver used for Windows
 
 FT245RL_linux under development
 
