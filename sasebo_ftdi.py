@@ -1,13 +1,14 @@
-#!/usr/bin/env python
-"""Sasebo_ftdi.py: Class for Sasebo-G device."""
+__author__ = "Ionut Gorgos"
+__copyright__ = "Copyright (C) 2016 Ionut Gorgos"
+__license__ = "Public Domain"
+__version__ = "1.0"
 
-__author__ = 'Ionut Gorgos'
-__copyright__ = 'Copyright (c) 2016 Ionut Gorgos'
+# This file implements a class for SASEBO_G
+# Thanks IST and Toshihiro Katashita
+# http://web.archive.org/web/20110723090912/http://www.aist.go.jp/aist_e
+# /research_results/publications/synthesiology_e/vol3_no1/vol03_01_p86_p95.pdf
 
-import binascii
 import FT245RL_ftdi
-import array
-
 
 class SASEBO:
     def __init__(self):

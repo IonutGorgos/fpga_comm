@@ -1,3 +1,10 @@
+__author__ = "Ionut Gorgos"
+__copyright__ = "Copyright (C) 2016 Ionut Gorgos"
+__license__ = "Public Domain"
+__version__ = "1.0"
+
+# This file implements a command line script to encrypt data to SASEBO G
+
 import sasebo_ftdi
 import binascii
 from Crypto import Random
