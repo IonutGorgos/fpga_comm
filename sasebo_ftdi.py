@@ -4,7 +4,7 @@ __license__ = "Public Domain"
 __version__ = "1.0"
 
 # This file implements a class for SASEBO_G
-# Thanks IST and Toshihiro Katashita
+# Thanks AIST and Toshihiro Katashita
 # http://web.archive.org/web/20110723090912/http://www.aist.go.jp/aist_e
 # /research_results/publications/synthesiology_e/vol3_no1/vol03_01_p86_p95.pdf
 
