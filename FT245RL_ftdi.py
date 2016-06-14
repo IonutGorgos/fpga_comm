@@ -9,7 +9,7 @@ import pyftdi.ftdi
 import pyftdi.bits
 import pyftdi.spi
 import pyftdi.usbtools
-
+import time
 
 class FTDI_USB:
     def __init__(self):
@@ -26,6 +26,7 @@ class FTDI_USB:
     def read(self, data, len):
         bytes = self.device.read_data(data)
         # print binascii.hexlify(bytes).upper()     # testing
+        time.sleep(0.1)
         return bytes
 
     # ------------------------------------------------------------------Write()

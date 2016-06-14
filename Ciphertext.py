@@ -9,39 +9,59 @@ import sasebo_ftdi
 import binascii
 from Crypto import Random
 from Crypto.Cipher import AES
+import argparse
 
-hw = sasebo_ftdi.SASEBO()
-hw.open()
-rand = Random.new()
 
-#key = bytearray(rand.getrandbits(8) for _ in xrange(16))
-key = rand.read(16)
-#print "Key                   : " , binascii.hexlify(key).upper()
+def main():
+    """Command line tool to encrypt data to SASEBO G"""
 
-#Initialization
+    parser = argparse.ArgumentParser(description='Encrypt data to SASESBO G')
+    parser.add_argument(
+        'num_traces',
+        help='number of power traces',
+        type=int)
+    parser.add_argument('-v',
+                        '--verbose',
+                        action='store_true',
+                        help='increase output verbosity')
+    args = parser.parse_args()
 
-hw.setKey(key,16)       # Hardware setKey
-sw = AES.new(key, AES.MODE_ECB) # Software SetKey
+    hw = sasebo_ftdi.SASEBO()
+    hw.open()
+    rand = Random.new()
 
-num_trace = 1000
-i = 1
-while i <= num_trace:
-    progress = (100.0 * i / num_trace)
-    print
-    print "Trace nr. : ", i, "         Progress : ", progress,"%"
-    text_in = rand.read(16)
-    print "Plain text            : ", binascii.hexlify(text_in).upper()
+    # key = bytearray(rand.getrandbits(8) for _ in xrange(16))
+    key = rand.read(16)
+    # print "Key                   : " , binascii.hexlify(key).upper()
 
-    text_ans = sw.encrypt(text_in)      # Ciphertext from Crypto.AES
-    print "Cipher text(Software) : ", binascii.hexlify(text_ans).upper()
+    # Initialization
 
-    text_out = bytearray(16)
+    hw.setKey(key, 16)  # Hardware setKey
+    sw = AES.new(key, AES.MODE_ECB)  # Software SetKey
 
-    hw.writeText(text_in, 16)
-    hw.execute()
-    bytes = hw.readText(text_out, 16)       # Ciphertext from SASEBO
-    print "Cipher text(Hardware) : ",  binascii.hexlify(bytes).upper()
+    num_trace = args.num_traces
+    i = 1
+    while i <= num_trace:
+        progress = (100.0 * i / num_trace)
+        print
+        print "Trace nr. : ", i, "         Progress : ", progress, "%"
+        text_in = rand.read(16)
+        print "Plain text            : ", binascii.hexlify(text_in).upper()
 
-    i = i+1
-print "Key                   : " , binascii.hexlify(key).upper()
-hw.close()
+        text_ans = sw.encrypt(text_in)  # Ciphertext from Crypto.AES
+        print "Cipher text(Software) : ", binascii.hexlify(text_ans).upper()
+
+        text_out = bytearray(16)
+
+        hw.writeText(text_in, 16)
+        hw.execute()
+        bytes = hw.readText(text_out, 16)  # Ciphertext from SASEBO
+        print "Cipher text(Hardware) : ", binascii.hexlify(bytes).upper()
+
+        i = i + 1
+    print "Key                   : ", binascii.hexlify(key).upper()
+    hw.close()
+
+
+if __name__ == "__main__":
+    main()
