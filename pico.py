@@ -66,6 +66,7 @@ class PICO:
                                        numSamples=self.nSamples,
                                        downSampleRatio=values,
                                        downSampleMode=mode)
+            A = self.movingAverage(A, 16)
             (B, nr) = self.ps.getDataV(channel=chNum2,
                                        numSamples=self.nSamples)
             if enabled3 == True:
@@ -79,3 +80,7 @@ class PICO:
                              mdict={'Time': Time, 'A': A, 'B': B})
             i = i + 1
         self.ps.stop()
+
+    def movingAverage(self, data, values):
+        window = np.ones(int(values)) / float(values)
+        return np.convolve(data, window, 'same')
