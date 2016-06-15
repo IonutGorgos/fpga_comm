@@ -14,8 +14,7 @@ timeout = int(data[5])
 enabledTrig = bool(data[6])
 nr_traces = int(data[7])
 pre_trig = float(data[8])
-downValues = int(data[9])
-downMode = int(data[10])
+values = int(data[9])
 filename = data[11].split('\n')
 filename = filename[0]
 ch1 = data[12].split('\n')
@@ -29,9 +28,9 @@ coupling = coupling[0]
 vR1 = float(data[16])
 vR2 = float(data[17])
 vR3 = float(data[18])
-enabled1 = bool(data[19])
-enabled2 = bool(data[20])
-enabled3 = bool(data[21])
+enabled1 = data[19]
+enabled2 = data[20]
+enabled3 = data[21]
 BWL1 = int(data[22])
 BWL2 = int(data[23])
 BWL3 = int(data[24])
@@ -41,7 +40,7 @@ print("Attempting to open Picoscope 6000...")
 ps.parameters(duration, sampleInterval)
 ps.get_samples()
 ps.trigger(trigger, threshold, direction, timeout, enabledTrig)
-ps.arm(nr_traces, pre_trig, downValues, downMode, filename, ch1, ch2, ch3,
+ps.arm(nr_traces, pre_trig, values, filename, ch1, ch2, ch3,
        coupling,
        vR1, vR2, vR3, enabled1,
        enabled2, enabled3, BWL1, BWL2, BWL3)

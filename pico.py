@@ -44,7 +44,7 @@ class PICO:
                                            enabled=enabled)
         return trigger
 
-    def arm(self, nr_traces, pre_trig, values, mode, filename, chNum1, chNum2,
+    def arm(self, nr_traces, pre_trig, values, filename, chNum1, chNum2,
             chNum3, chCoupling, chVRange1, chVRange2, chVRange3, enabled1,
             enabled2, enabled3,
             BWLimited1, BWLimited2, BWLimited3):
@@ -63,24 +63,24 @@ class PICO:
             self.ps.waitReady()
             print "Done waiting for trigger"
             (A, nr) = self.ps.getDataV(channel=chNum1,
-                                       numSamples=self.nSamples,
-                                       downSampleRatio=values,
-                                       downSampleMode=mode)
-            A = self.movingAverage(A, 16)
+                                       numSamples=self.nSamples)
+            A = self.movingAverage(A, values)
             (B, nr) = self.ps.getDataV(channel=chNum2,
                                        numSamples=self.nSamples)
             if enabled3 == True:
                 (C, nr) = self.ps.getDataV(channel=chNum3,
                                            numSamples=self.nSamples)
+                C = self.movingAverage(C, values)
                 Time = np.arange(self.nSamples) * self.actualSamplingInterval
                 scipy.io.savemat(filename + str(i),
                                  mdict={'Time': Time, 'A': A, 'B': B, 'C': C})
-            Time = np.arange(self.nSamples) * self.actualSamplingInterval
-            scipy.io.savemat(filename + str(i),
-                             mdict={'Time': Time, 'A': A, 'B': B})
+            else:
+                Time = np.arange(self.nSamples) * self.actualSamplingInterval
+                scipy.io.savemat(filename + str(i),
+                                 mdict={'Time': Time, 'A': A, 'B': B})
             i = i + 1
         self.ps.stop()
 
     def movingAverage(self, data, values):
         window = np.ones(int(values)) / float(values)
-        return np.convolve(data, window, 'same')
+        return np.convolve(data, window, 'same')  # for the same No.Samples

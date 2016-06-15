@@ -7,7 +7,7 @@ Falling
 True
 10
 0.17
-1
+16
 0
 test_
 A
@@ -16,7 +16,7 @@ C
 DC
 50E-3
 500E-3
-1000E-3
+100E-3
 True
 True
 False
