@@ -57,15 +57,15 @@ class PICO:
         channelC = self.channel(chNum=chNum3, chCoupling=chCoupling,
                                 chVRange=chVRange3, enabled=enabled3,
                                 BWLimited=BWLimited3)
-        i = 0
-        while i < nr_traces:
+        i = 1
+        while i <= nr_traces:
             self.ps.runBlock(pretrig=pre_trig)
             self.ps.waitReady()
             print "Done waiting for trigger"
             (A, nr) = self.ps.getDataV(channel=chNum1,
                                        numSamples=self.nSamples)
             A = self.movingAverage(A, values)
-            (B, nr) = self.ps.getDataV(channel=chNum2,
+            (C, nr) = self.ps.getDataV(channel=chNum2,
                                        numSamples=self.nSamples)
             if enabled3 == True:
                 (C, nr) = self.ps.getDataV(channel=chNum3,
@@ -83,4 +83,45 @@ class PICO:
 
     def movingAverage(self, data, values):
         window = np.ones(int(values)) / float(values)
-        return np.convolve(data, window, 'same')  # for the same No.Samples
+        return np.convolve(data, window, 'valid')  # for the same No.Samples
+
+    def read_from_file(self, config_file):
+        file = open(config_file, "r")
+        data = file.readlines()
+        file.close()
+        duration = float(data[0])
+        sampleInterval = float(data[1])
+        trigger = data[2].split('\n')
+        trigger = trigger[0]
+        threshold = float(data[3])
+        direction = data[4].split('\n')
+        direction = direction[0]
+        timeout = int(data[5])
+        enabledTrig = bool(data[6])
+        nr_traces = int(data[7])
+        pre_trig = float(data[8])
+        values = int(data[9])
+        filename = data[11].split('\n')
+        filename = filename[0]
+        ch1 = data[12].split('\n')
+        ch2 = data[13].split('\n')
+        ch3 = data[14].split('\n')
+        ch1 = ch1[0]
+        ch2 = ch2[0]
+        ch3 = ch3[0]
+        coupling = data[15].split('\n')
+        coupling = coupling[0]
+        vR1 = float(data[16])
+        vR2 = float(data[17])
+        vR3 = float(data[18])
+        enabled1 = data[19]
+        enabled2 = data[20]
+        enabled3 = data[21]
+        BWL1 = int(data[22])
+        BWL2 = int(data[23])
+        BWL3 = int(data[24])
+        return (
+            duration, sampleInterval, trigger, threshold, direction, timeout,
+            enabledTrig, nr_traces, pre_trig, values, filename, ch1, ch2, ch3,
+            coupling, vR1, vR2, vR3, enabled1, enabled2, enabled3, BWL1, BWL2,
+            BWL3)
