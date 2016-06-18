@@ -2,6 +2,7 @@ from cnc_comm import *
 from pico import *
 from ciphertext import *
 from sasebo_ftdi import *
+from cnc_cmd import *
 
 
 def capture_data(config_file):
@@ -83,9 +84,76 @@ def run_crypto(config_file):
     hw.close()
 
 
-def save_position(x):
-    file = open("pos.txt", 'w')
-    file.write("%.2f\n" % x)
-    file.close()
+def main():
+    # Command line tool
+
+    parser = argparse.ArgumentParser(description='Help')
+    parser.add_argument(
+        'port',
+        help='the name of the serial port to communicate to the Arduino, '
+             'e.g. COM10'
+    )
+    parser.add_argument(
+        '--calibrate',
+        action='store_true',
+        help='calibrate the CNC')
+    parser.add_argument(
+        '--home',
+        action='store_true',
+        help='reset to the home position the CNC')
+    parser.add_argument(
+        '--f',
+        nargs=1,
+        type=argparse.FileType('r'),
+        default=False, metavar='filename',
+        help='the file containing the gcode')
+
+    parser.add_argument(
+        '--x',
+        nargs=1,
+        type=float,
+        default=0.0,
+        metavar='value',
+        # action = 'store_true',
+        help='the distance on x axis in mm')
+    parser.add_argument(
+        '--y',
+        nargs=1,
+        type=float,
+        default=0.0,
+        metavar='value',
+        # action = 'store_true',
+        help='the distance on y axis in mm')
+
+    args = parser.parse_args()
+    port = args.port
+    cnc = CncComm()
+    cnc.open_port(port)
+
+    if args.calibrate == True:
+        print ("Sending calibrate command...")
+        try:
+            elapsed = cnc.go_home()
+            save_position(0, 0)
+            time.sleep(abs(elapsed) / 2)
+            print ("Done")
+        except:
+            print ("Error sending command")
+
+    elif args.home == True:
+        print ("Sending reset command...")
+        try:
+            retrieve_data(cnc, 0, 80)
+            # save_position(0,0)
+            print ("Done")
+        except:
+            print ("Error sending command")
+
+
+
+            # retrieve_data(cnc, args.x[0], args.y[0])
 
 # run_crypto("conf1.txt")
+
+if __name__ == '__main__':
+    main()
