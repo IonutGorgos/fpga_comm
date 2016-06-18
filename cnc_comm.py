@@ -71,7 +71,7 @@ class CncComm:
         a = time.time()  # to measure time elapsed
         self.ser.write(move + '\n')
         grbl_out = self.ser.readline()
-        time.sleep(xValue / 2)
+        time.sleep(abs(xValue) / 2)
         print 'X : ' + str(xValue) + " = " + grbl_out.strip()
         elapsed = time.time() - a  # to measure time elapsed
         print 'Time elapsed: ', elapsed, 'sec'  # to measure time elapsed
@@ -87,23 +87,15 @@ class CncComm:
         move = "G00 Y" + str(yValue)
         a = time.time()  # to measure time elapsed
         self.ser.write(move + '\n')
-        # i = 0.0
-        # while i < abs(yValue):
-        #     # print "Y : " + str(i)
-        #     # print (str(i))
-        #     if (abs(yValue) - i) < 0.005:
-        #         break
-        #     # time.sleep(0.05)
-        #     i = i + 0.10
 
         grbl_out = self.ser.readline()
-        time.sleep(yValue / 2)
+        time.sleep(abs(yValue) / 2)
         print 'Y : ' + str(yValue) + " = " + grbl_out.strip()
         elapsed = time.time() - a  # to measure time elapsed
         print 'Time elapsed: ', elapsed, 'sec'  # to measure time elapsed
-        # raw_input("	Press <Enter> to exit and disable grbl."
         # self.ser.close()
-        return yValue
+        self.y = self.y + yValue
+        return self.y
 
     def go_home(self):
         self.ser.write("\r\n\r\n")
@@ -114,7 +106,3 @@ class CncComm:
         # raw_input("Your position is (0, 0, 0), press <Enter> to exit.")
         # self.ser.close()
 
-    def save_position(self, x):
-        file = open("pos.txt", 'w')
-        file.write("%.2f\n" % x)
-        file.close()

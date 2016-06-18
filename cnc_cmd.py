@@ -3,10 +3,29 @@ import argparse
 import sys
 
 
-def save_position(x):
+def save_position(x, y):
     file = open("pos.txt", 'w')
-    file.write("%.2f\n" % x)
+    file.write("%.2f\n%.2f\n" % (x, y))
     file.close()
+
+
+def retrieve_data(cnc, x, y):
+    file = open("pos.txt", 'r')
+    data = file.readlines()
+    file.close()
+    x_pos = float(data[0])
+    y_pos = float(data[1])
+    if ((x_pos == x) & (y_pos == y)):
+        print ("You are at %.2f, %.2f" % (x_pos, y_pos))
+    elif (((x_pos + x) > 0) & ((y_pos + y) > 0)):
+        if ((x_pos != x)):
+            p = cnc.stream_code_x_axis(-(x_pos - x))
+        if ((y_pos != y)):
+            q = cnc.stream_code_y_axis(-(y_pos - y))
+
+        save_position(x, y)
+    else:
+        print ("You are at the limit of the axis !!")
 
 
 def main():
@@ -51,26 +70,24 @@ def main():
 
     cnc = CncComm()
     cnc.open_port(port)
-    file = open("pos.txt", 'r')
-    data = file.readlines()
-    file.close()
-    x_pos = float(data[0])
-    print x_pos
-    print args.x[0]
-    print (x_pos == args.x[0])
-    if (x_pos == args.x[0]):
-        print "aaaaa"
-    else:
-        x = cnc.stream_code_x_axis(args.x[0])
-        save_position(x)
+    retrieve_data(cnc, args.x[0], args.y[0])
 
-
-        # filename = args.grbl_file
-
-        # cnc.stream_code_from_file(filename)
-
-        # y = cnc.stream_code_y_axis(args.y[0])
-        # print "You are at ( ", x, ", ", y, ")"
+    # file = open("pos.txt", 'r')
+    # data = file.readlines()
+    # file.close()
+    # x_pos = float(data[0])
+    # y_pos = float(data[1])
+    # if ((x_pos == args.x[0]) & (y_pos == args.y[0])):
+    #     print ("You are at %.2f, %.2f" % (x_pos, y_pos))
+    # elif (((x_pos + args.x[0]) > 0) & ((y_pos + args.y[0]) > 0)):
+    #     if ((x_pos != args.x[0])):
+    #         x = cnc.stream_code_x_axis(-(x_pos - args.x[0]))
+    #     if ((y_pos != args.y[0])):
+    #         y = cnc.stream_code_y_axis(-(y_pos - args.y[0]))
+    #
+    #     save_position(args.x[0], args.y[0])
+    # else:
+    #     print ("You are at the limit of the axis !!")
 
 
 if __name__ == '__main__':
