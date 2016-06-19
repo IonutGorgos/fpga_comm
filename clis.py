@@ -97,10 +97,12 @@ def main():
         '--calibrate',
         action='store_true',
         help='calibrate the CNC')
+
     parser.add_argument(
         '--home',
         action='store_true',
-        help='reset to the home position the CNC')
+        help='reset the CNC to the home position (0, 80)')
+
     parser.add_argument(
         '--f',
         nargs=1,
@@ -116,6 +118,7 @@ def main():
         metavar='value',
         # action = 'store_true',
         help='the distance on x axis in mm')
+
     parser.add_argument(
         '--y',
         nargs=1,
@@ -124,6 +127,13 @@ def main():
         metavar='value',
         # action = 'store_true',
         help='the distance on y axis in mm')
+
+    parser.add_argument(
+        '--run',
+        nargs=1,
+        default=False, metavar='config_file',
+        help='the configuration file for PicoScope')
+
 
     args = parser.parse_args()
     port = args.port
@@ -148,6 +158,17 @@ def main():
             print ("Done")
         except:
             print ("Error sending command")
+    elif args.run != False:
+        print ("Capture data...")
+        try:
+            # args.run[0] = args.run[0].split('\n')
+            print (args.run[0])
+            # run_crypto("conf1.txt")
+            run_crypto("args.run[0]")
+            # capture_data("conf1.txt")
+            print("Done")
+        except:
+            print("Error!")
 
 
 
