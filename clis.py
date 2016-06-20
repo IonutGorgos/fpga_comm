@@ -12,8 +12,8 @@ import shlex, subprocess
 
 def run(commands):
     length = len(commands)
-    print length
-    print commands[0]
+    # print length
+    # print commands[0]
     x = 0
     while x < length:
         exec ("threading.Thread(target = " + commands[x] + ").start()")
@@ -28,7 +28,8 @@ def capture_data():
      enabledTrig,
      nr_traces, pre_trig, values, filename, ch1, ch2, ch3, coupling, vR1, vR2,
      vR3,
-     enabled1, enabled2, enabled3, BWL1, BWL2, BWL3) = ps.read_from_file(
+     enabled1, enabled2, enabled3, BWL1, BWL2, BWL3,
+     values2) = ps.read_from_file(
         "conf1.txt")
 
     t = time.time()
@@ -37,7 +38,7 @@ def capture_data():
     print e
 
     print("Attempting to open Picoscope 6000...")
-
+    print filename
     ps.parameters(duration, sampleInterval)
     ps.get_samples()
     ps.trigger(trigger, threshold, direction, timeout, enabledTrig)
@@ -47,7 +48,7 @@ def capture_data():
     ps.arm(nr_traces, pre_trig, values, filename, ch1, ch2, ch3,
            coupling,
            vR1, vR2, vR3, enabled1,
-           enabled2, enabled3, BWL1, BWL2, BWL3)
+           enabled2, enabled3, BWL1, BWL2, BWL3, values2)
 
     print("Attempting to close Picoscope 6000...")
 
@@ -55,7 +56,7 @@ def capture_data():
 
 
 def run_crypto():
-    time.sleep(1)
+    time.sleep(0.98)
     hw = sasebo_ftdi.SASEBO()
     with open('key.txt', 'w'):
         pass
@@ -80,16 +81,15 @@ def run_crypto():
     with open('key.txt', 'a') as f:
         f.write(str(num_trace) + '\n')
     while i <= num_trace:
-        progress = (100.0 * i / num_trace)
-        print
-        print "Trace nr. : ", i, "         Progress : ", progress, "%"
+        # progress = (100.0 * i / num_trace)
+        #print "Trace nr. : ", i, "         Progress : ", progress, "%"
         text_in = rand.read(16)
         with open('key.txt', 'a+') as f:
             f.write(binascii.hexlify(text_in).upper() + '\n')
-        print "Plain text            : ", binascii.hexlify(text_in).upper()
+        #print "Plain text            : ", binascii.hexlify(text_in).upper()
 
         text_ans = sw.encrypt(text_in)  # Ciphertext from Crypto.AES
-        print "Cipher text(Software) : ", binascii.hexlify(text_ans).upper()
+        #print "Cipher text(Software) : ", binascii.hexlify(text_ans).upper()
 
         text_out = bytearray(16)
 
@@ -97,7 +97,7 @@ def run_crypto():
         hw.execute()
         bytes = hw.readText(text_out, 16)  # Ciphertext from SASEBO
 
-        print "Cipher text(Hardware) : ", binascii.hexlify(bytes).upper()
+        #print "Cipher text(Hardware) : ", binascii.hexlify(bytes).upper()
 
         i = i + 1
 
@@ -105,8 +105,8 @@ def run_crypto():
     with open('key.txt', 'a') as f:
         f.write(binascii.hexlify(key).upper())
 
-    with open('key.txt', 'r') as f:
-        print f.read()
+        # with open('key.txt', 'r') as f:
+        #print f.read()
     hw.close()
 
 

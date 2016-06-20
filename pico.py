@@ -3,7 +3,8 @@ from picoscope import ps6000
 from picoscope import picobase
 import numpy as np
 import scipy.io
-
+import ast
+import os
 
 class PICO:
     def __init__(self):
@@ -45,7 +46,7 @@ class PICO:
     def arm(self, nr_traces, pre_trig, values, filename, chNum1, chNum2,
             chNum3, chCoupling, chVRange1, chVRange2, chVRange3, enabled1,
             enabled2, enabled3,
-            BWLimited1, BWLimited2, BWLimited3):
+            BWLimited1, BWLimited2, BWLimited3, values2):
         channelA = self.channel(chNum=chNum1, chCoupling=chCoupling,
                                 chVRange=chVRange1, enabled=enabled1,
                                 BWLimited=BWLimited1)
@@ -58,32 +59,37 @@ class PICO:
         channelD = self.channel(chNum='D', chCoupling=chCoupling,
                                 chVRange=50E-3, enabled=False, BWLimited=0)
         i = 1
-        while i <= nr_traces:
+        while i <= nr_traces + 5:
             self.ps.runBlock(pretrig=pre_trig)
             self.ps.waitReady()
-            print "Done waiting for trigger"
+            path = "traces/"
+            fullpath = os.path.join(path, filename)
+            print ("Done waiting for trigger")
             A = self.ps.getDataV(channel=chNum1,
                                  numSamples=self.nSamples)
             A = self.movingAverage(A, values)
+
             C = self.ps.getDataV(channel=chNum3,
                                  numSamples=self.nSamples)
-            if enabled2 == True:
+            if (enabled2):
                 B = self.ps.getDataV(channel=chNum2,
                                      numSamples=self.nSamples)
-                B = self.movingAverage(B, values)
+                B = self.movingAverage(B, values2)
                 Time = np.arange(self.nSamples) * self.actualSamplingInterval
-                scipy.io.savemat(filename + str(i),
+                scipy.io.savemat(fullpath + str(i),
                                  mdict={'Time': Time, 'A': A, 'B': B, 'C': C})
             else:
                 Time = np.arange(self.nSamples) * self.actualSamplingInterval
-                scipy.io.savemat(filename + str(i),
+                # scipy.io.savemat(filename + str(i),
+                # mdict={'Time': Time, 'A': A, 'C': C})
+                scipy.io.savemat(fullpath + str(i),
                                  mdict={'Time': Time, 'A': A, 'C': C})
             i = i + 1
         self.ps.stop()
 
     def movingAverage(self, data, values):
         window = np.ones(int(values)) / float(values)
-        return np.convolve(data, window, 'valid')
+        return np.convolve(data, window, 'same')
 
     def read_from_file(self, config_file):
         file = open(config_file, "r")
@@ -114,14 +120,15 @@ class PICO:
         vR1 = float(data[16])
         vR2 = float(data[17])
         vR3 = float(data[18])
-        enabled1 = data[19]
-        enabled2 = data[20]
-        enabled3 = data[21]
+        enabled1 = ast.literal_eval(data[19])
+        enabled2 = ast.literal_eval(data[20])
+        enabled3 = ast.literal_eval(data[21])
         BWL1 = int(data[22])
         BWL2 = int(data[23])
         BWL3 = int(data[24])
+        values2 = int(data[25])
         return (
             duration, sampleInterval, trigger, threshold, direction, timeout,
             enabledTrig, nr_traces, pre_trig, values, filename, ch1, ch2, ch3,
             coupling, vR1, vR2, vR3, enabled1, enabled2, enabled3, BWL1, BWL2,
-            BWL3)
+            BWL3, values2)
