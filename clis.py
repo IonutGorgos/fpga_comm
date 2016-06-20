@@ -3,9 +3,25 @@ from pico import *
 from ciphertext import *
 from sasebo_ftdi import *
 from cnc_cmd import *
+from multiprocessing import Process
+import threading
+import shlex, subprocess
 
 
-def capture_data(config_file):
+# config_file = 'conf1.txt'
+
+def run(commands):
+    length = len(commands)
+    print length
+    print commands[0]
+    x = 0
+    while x < length:
+        exec ("threading.Thread(target = " + commands[x] + ").start()")
+        x = x + 1
+    return True
+
+
+def capture_data():
     ps = PICO()
 
     (duration, sampleInterval, trigger, threshold, direction, timeout,
@@ -13,7 +29,7 @@ def capture_data(config_file):
      nr_traces, pre_trig, values, filename, ch1, ch2, ch3, coupling, vR1, vR2,
      vR3,
      enabled1, enabled2, enabled3, BWL1, BWL2, BWL3) = ps.read_from_file(
-        config_file)
+        "conf1.txt")
 
     t = time.time()
     ps.open()
@@ -27,7 +43,7 @@ def capture_data(config_file):
     ps.trigger(trigger, threshold, direction, timeout, enabledTrig)
 
     # Arm trigger
-    time.sleep(1)
+    #time.sleep(1)
     ps.arm(nr_traces, pre_trig, values, filename, ch1, ch2, ch3,
            coupling,
            vR1, vR2, vR3, enabled1,
@@ -38,11 +54,16 @@ def capture_data(config_file):
     ps.close()
 
 
-def run_crypto(config_file):
+def run_crypto():
+    time.sleep(1)
     hw = sasebo_ftdi.SASEBO()
+    with open('key.txt', 'w'):
+        pass
+    print "aa"
     hw.open()
+    print "bb"
     rand = Random.new()
-    (data) = PICO().read_from_file(config_file)
+    (data) = PICO().read_from_file("conf1.txt")
 
     # key = bytearray(rand.getrandbits(8) for _ in xrange(16))
     key = rand.read(16)
@@ -56,11 +77,15 @@ def run_crypto(config_file):
     # num_trace = args.num_traces
     num_trace = data[7]
     i = 1
+    with open('key.txt', 'a') as f:
+        f.write(str(num_trace) + '\n')
     while i <= num_trace:
         progress = (100.0 * i / num_trace)
         print
         print "Trace nr. : ", i, "         Progress : ", progress, "%"
         text_in = rand.read(16)
+        with open('key.txt', 'a+') as f:
+            f.write(binascii.hexlify(text_in).upper() + '\n')
         print "Plain text            : ", binascii.hexlify(text_in).upper()
 
         text_ans = sw.encrypt(text_in)  # Ciphertext from Crypto.AES
@@ -77,10 +102,11 @@ def run_crypto(config_file):
         i = i + 1
 
     print "Key                   : ", binascii.hexlify(key).upper()
-    file = open("key.txt", 'w')
-    file.write("%d\n" % num_trace)
-    file.close()
+    with open('key.txt', 'a') as f:
+        f.write(binascii.hexlify(key).upper())
 
+    with open('key.txt', 'r') as f:
+        print f.read()
     hw.close()
 
 
@@ -134,11 +160,19 @@ def main():
         default=False, metavar='config_file',
         help='the configuration file for PicoScope')
 
+    parser.add_argument(
+        '--capture',
+        nargs=1,
+        default=False, metavar='config_file',
+        help='the configuration file for PicoScope')
+
 
     args = parser.parse_args()
     port = args.port
     cnc = CncComm()
     cnc.open_port(port)
+
+    #run_crypto("conf1.txt")
 
     if args.calibrate == True:
         print ("Sending calibrate command...")
@@ -161,12 +195,28 @@ def main():
     elif args.run != False:
         print ("Capture data...")
         try:
-            # args.run[0] = args.run[0].split('\n')
-            print (args.run[0])
-            # run_crypto("conf1.txt")
-            run_crypto("args.run[0]")
-            # capture_data("conf1.txt")
+            # p1 = Process(target= + capture_data(args.run[0]) + run_crypto(
+            # args.run[0]) )
+            # p1.start()
+            # p2 = Process(target= capture_data(args.run[0]))
+
+            run(['capture_data', 'run_crypto'])  # parelel
+            #run(['capture_data("conf1.txt")', 'run_crypto("conf1.txt")'])
             print("Done")
+        except:
+            print("Error!")
+    elif args.x != False:
+        print ("Sending x, y values")
+        try:
+            retrieve_data(cnc, args.x[0], args.y[0])
+            print ("Done")
+        except:
+            print("Error!")
+    elif args.y != False:
+        print ("Sending x, y values")
+        try:
+            retrieve_data(cnc, args.x[0], args.y[0])
+            print ("Done")
         except:
             print("Error!")
 

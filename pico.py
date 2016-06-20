@@ -7,11 +7,11 @@ import scipy.io
 
 class PICO:
     def __init__(self):
-        self.sampleInterval = 3.2
-        self.duration = 2
-        self.actualSamplingInterval = 0
+        # self.sampleInterval = 3.2
+        # self.duration = 2
+        # self.actualSamplingInterval = 0
         self.nSamples = 0
-        self.sampleRate = 1 / self.sampleInterval
+        #self.sampleRate = 1 / self.sampleInterval
 
     def open(self):
         self.ps = ps6000.PS6000()
@@ -24,11 +24,10 @@ class PICO:
         self.sampleInterval = sampleInterval
 
     def get_samples(self):
-        (self.actualSamplingInterval, self.nSamples, maxSamples,
-         self.sampleRate) = \
+        (self.actualSamplingInterval, self.nSamples, maxSamples) = \
             self.ps.setSamplingInterval(self.sampleInterval, self.duration)
         # nSamples = self.nSamples
-        return (self.actualSamplingInterval, self.nSamples, self.sampleRate)
+        return (self.actualSamplingInterval, self.nSamples)
 
     def channel(self, chNum, chCoupling, chVRange, enabled, BWLimited):
         channel = self.ps.setChannel(channel=chNum, coupling=chCoupling,
@@ -42,7 +41,6 @@ class PICO:
                                            direction=direction,
                                            timeout_ms=timeout_ms,
                                            enabled=enabled)
-        return trigger
 
     def arm(self, nr_traces, pre_trig, values, filename, chNum1, chNum2,
             chNum3, chCoupling, chVRange1, chVRange2, chVRange3, enabled1,
@@ -57,33 +55,35 @@ class PICO:
         channelC = self.channel(chNum=chNum3, chCoupling=chCoupling,
                                 chVRange=chVRange3, enabled=enabled3,
                                 BWLimited=BWLimited3)
+        channelD = self.channel(chNum='D', chCoupling=chCoupling,
+                                chVRange=50E-3, enabled=False, BWLimited=0)
         i = 1
         while i <= nr_traces:
             self.ps.runBlock(pretrig=pre_trig)
             self.ps.waitReady()
             print "Done waiting for trigger"
-            (A, nr) = self.ps.getDataV(channel=chNum1,
-                                       numSamples=self.nSamples)
+            A = self.ps.getDataV(channel=chNum1,
+                                 numSamples=self.nSamples)
             A = self.movingAverage(A, values)
-            (C, nr) = self.ps.getDataV(channel=chNum2,
-                                       numSamples=self.nSamples)
-            if enabled3 == True:
-                (C, nr) = self.ps.getDataV(channel=chNum3,
-                                           numSamples=self.nSamples)
-                C = self.movingAverage(C, values)
+            C = self.ps.getDataV(channel=chNum3,
+                                 numSamples=self.nSamples)
+            if enabled2 == True:
+                B = self.ps.getDataV(channel=chNum2,
+                                     numSamples=self.nSamples)
+                B = self.movingAverage(B, values)
                 Time = np.arange(self.nSamples) * self.actualSamplingInterval
                 scipy.io.savemat(filename + str(i),
                                  mdict={'Time': Time, 'A': A, 'B': B, 'C': C})
             else:
                 Time = np.arange(self.nSamples) * self.actualSamplingInterval
                 scipy.io.savemat(filename + str(i),
-                                 mdict={'Time': Time, 'A': A, 'B': B})
+                                 mdict={'Time': Time, 'A': A, 'C': C})
             i = i + 1
         self.ps.stop()
 
     def movingAverage(self, data, values):
         window = np.ones(int(values)) / float(values)
-        return np.convolve(data, window, 'valid')  # for the same No.Samples
+        return np.convolve(data, window, 'valid')
 
     def read_from_file(self, config_file):
         file = open(config_file, "r")

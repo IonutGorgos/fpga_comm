@@ -98,11 +98,13 @@ class CncComm:
         return self.y
 
     def go_home(self):
+        r = -80
         self.ser.write("\r\n\r\n")
         time.sleep(2)
         self.ser.flushInput()
         self.ser.write("$X\nG21\nG90" + '\n')
-        self.ser.write("G00 X0 Y-80")
+        move = "G00 X0 Y" + str(r)
+        self.ser.write(move + '\n')
         # raw_input("Your position is (0, 0, 0), press <Enter> to exit.")
         # self.ser.close()
-
+        return r

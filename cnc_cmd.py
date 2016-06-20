@@ -17,7 +17,7 @@ def retrieve_data(cnc, x, y):
     y_pos = float(data[1])
     if ((x_pos == x) & (y_pos == y)):
         print ("You are at %.2f, %.2f" % (x_pos, y_pos))
-    elif (((x_pos + x) > 0) & ((y_pos + y) > 0)):
+    elif (((x_pos + x) >= 0) & ((y_pos + y) >= 0)):
         if ((x_pos != x)):
             p = cnc.stream_code_x_axis(-(x_pos - x))
         if ((y_pos != y)):
