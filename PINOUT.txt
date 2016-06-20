@@ -1,0 +1,32 @@
+Axis	STEP PIN	DIR PIN		Enable			
+
+
+X	1(albastru)	7(rosu)		14(maro)		
+Arduino 2		5		    9(5V)
+
+Y	8(gri, galben)		3(portocaliu)	2(negru-mov)
+Arduino 3			    6		        A2(5V)
+
+Z	5(alb-negru)		4(mov)		6(galben)
+Arduino 4			7		A3(5V)
+
+Reset = 10 (verde)               			A0
+
+
+Settings
+
+
+$100 = 66.66667
+$101 = 66.66667
+$102 = 66.66667
+$110 = 120
+$111 = 120
+$112 = 120
+$120 = 4
+$121 = 4
+$122 = 4
+
+Y = 80		home_Y
+X = 0     	home_X
+28.4cm pe X
+sau 28 cm pe X
