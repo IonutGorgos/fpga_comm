@@ -32,19 +32,18 @@ def capture_data():
      values2) = ps.read_from_file(
         "conf1.txt")
 
-    t = time.time()
+    # t = time.time()
     ps.open()
-    e = time.time() - t
-    print e
+    # e = time.time() - t
+    #print e
 
     print("Attempting to open Picoscope 6000...")
-    print filename
     ps.parameters(duration, sampleInterval)
     ps.get_samples()
     ps.trigger(trigger, threshold, direction, timeout, enabledTrig)
 
     # Arm trigger
-    #time.sleep(1)
+    #time.sleep(0.001)
     ps.arm(nr_traces, pre_trig, values, filename, ch1, ch2, ch3,
            coupling,
            vR1, vR2, vR3, enabled1,
@@ -56,19 +55,21 @@ def capture_data():
 
 
 def run_crypto():
-    time.sleep(0.98)
+    time.sleep(1)
     hw = sasebo_ftdi.SASEBO()
     with open('key.txt', 'w'):
         pass
-    print "aa"
     hw.open()
-    print "bb"
     rand = Random.new()
     (data) = PICO().read_from_file("conf1.txt")
-
+    num_trace = data[7]
+    with open('key.txt', 'a') as f:
+        f.write(str(num_trace) + '\n')
     # key = bytearray(rand.getrandbits(8) for _ in xrange(16))
     key = rand.read(16)
     # print "Key                   : " , binascii.hexlify(key).upper()
+    with open('key.txt', 'a') as f:
+        f.write(binascii.hexlify(key).upper() + '\n')
 
     # Initialization
 
@@ -76,10 +77,9 @@ def run_crypto():
     sw = AES.new(key, AES.MODE_ECB)  # Software SetKey
 
     # num_trace = args.num_traces
-    num_trace = data[7]
+
     i = 1
-    with open('key.txt', 'a') as f:
-        f.write(str(num_trace) + '\n')
+
     while i <= num_trace:
         # progress = (100.0 * i / num_trace)
         #print "Trace nr. : ", i, "         Progress : ", progress, "%"
@@ -102,9 +102,6 @@ def run_crypto():
         i = i + 1
 
     print "Key                   : ", binascii.hexlify(key).upper()
-    with open('key.txt', 'a') as f:
-        f.write(binascii.hexlify(key).upper())
-
         # with open('key.txt', 'r') as f:
         #print f.read()
     hw.close()
@@ -156,8 +153,7 @@ def main():
 
     parser.add_argument(
         '--run',
-        nargs=1,
-        default=False, metavar='config_file',
+        action='store_true',
         help='the configuration file for PicoScope')
 
     parser.add_argument(
@@ -200,9 +196,10 @@ def main():
             # p1.start()
             # p2 = Process(target= capture_data(args.run[0]))
 
-            run(['capture_data', 'run_crypto'])  # parelel
+            a = run(['capture_data', 'run_crypto'])  # parelel
             #run(['capture_data("conf1.txt")', 'run_crypto("conf1.txt")'])
-            print("Done")
+            if a:
+                print("Done")
         except:
             print("Error!")
     elif args.x != False:
