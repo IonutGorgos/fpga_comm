@@ -3,57 +3,7 @@ from pico import *
 from ciphertext import *
 from sasebo_ftdi import *
 from cnc_cmd import *
-from multiprocessing import Process
-import threading
-import shlex, subprocess
-
-
-# config_file = 'conf1.txt'
-
-def run(commands):
-    length = len(commands)
-    # print length
-    # print commands[0]
-    x = 0
-    while x < length:
-        exec ("threading.Thread(target = " + commands[x] + ").start()")
-        x = x + 1
-    return True
-
-
-def capture_data():
-    ps = PICO()
-    a = time.time()
-    (duration, sampleInterval, trigger, threshold, direction, timeout,
-     enabledTrig,
-     nr_traces, pre_trig, values, filename, ch1, ch2, ch3, coupling, vR1, vR2,
-     vR3,
-     enabled1, enabled2, enabled3, BWL1, BWL2, BWL3,
-     values2) = ps.read_from_file(
-        "conf1.txt")
-
-    # t = time.time()
-    ps.open()
-    # e = time.time() - t
-    # print e
-
-    print("Attempting to open Picoscope 6000...")
-    ps.parameters(duration, sampleInterval)
-    ps.get_samples()
-    ps.trigger(trigger, threshold, direction, timeout, enabledTrig)
-
-    # Arm trigger
-    # time.sleep(0.001)
-    ps.arm(nr_traces, pre_trig, values, filename, ch1, ch2, ch3,
-           coupling,
-           vR1, vR2, vR3, enabled1,
-           enabled2, enabled3, BWL1, BWL2, BWL3, values2)
-
-    print("Attempting to close Picoscope 6000...")
-    b = time.time() - a
-    print b
-    ps.close()
-
+from picocmd import *
 
 def run_crypto():
     time.sleep(1)
@@ -62,15 +12,11 @@ def run_crypto():
         pass
     hw.open()
     rand = Random.new()
-    (data) = PICO().read_from_file("conf1.txt")
+    data = PICO().read_from_file("conf1.txt")
     num_trace = data[7]
-    with open('key.raw', 'ab') as f:
-        f.write(str(num_trace))
     # key = bytearray(rand.getrandbits(8) for _ in xrange(16))
     key = rand.read(16)
     # print "Key                   : " , binascii.hexlify(key).upper()
-    with open('key.raw', 'ab') as f:
-        f.write(binascii.hexlify(key).upper())
 
     # Initialization
 
@@ -85,8 +31,6 @@ def run_crypto():
         # progress = (100.0 * i / num_trace)
         # print "Trace nr. : ", i, "         Progress : ", progress, "%"
         text_in = rand.read(16)
-        with open('key.raw', 'ab') as f:
-            f.write(binascii.hexlify(text_in).upper())
         # print "Plain text            : ", binascii.hexlify(text_in).upper()
 
         text_ans = sw.encrypt(text_in)  # Ciphertext from Crypto.AES
@@ -103,8 +47,6 @@ def run_crypto():
         i = i + 1
 
     print "Key                   : ", binascii.hexlify(key).upper()
-    # with open('key.txt', 'r') as f:
-    # print f.read()
     hw.close()
 
 
@@ -125,7 +67,7 @@ def main():
     parser.add_argument(
         '--home',
         action='store_true',
-        help='reset the CNC to the home position (0, 80)')
+        help='reset the CNC to the home position (0, 76)')
 
     parser.add_argument(
         '--f',
@@ -154,7 +96,8 @@ def main():
 
     parser.add_argument(
         '--run',
-        action='store_true',
+        nargs=1,
+        default=False, metavar='config_file',
         help='the configuration file for PicoScope')
 
     parser.add_argument(
@@ -191,14 +134,21 @@ def main():
     elif args.run != False:
         print ("Capture data...")
         try:
-            # p1 = Process(target= + capture_data(args.run[0]) + run_crypto(
-            # args.run[0]) )
-            # p1.start()
-            # p2 = Process(target= capture_data(args.run[0]))
-            a = run(['capture_data', 'run_crypto'])  # parelel
-            # run(['capture_data("conf1.txt")', 'run_crypto("conf1.txt")'])
-            if a:
-                print("Done")
+            ps = pico.PICO()
+            print("Attempting to open Picoscope 6000...")
+            (duration, sampleInterval, trigger, n_captures, pre_trig, values,
+             mode, filename, ch1, ch2, ch3, ch4,
+             coupling, vR1, vR2, vR3, vR4, enabled1, enabled2, enabled3,
+             enabled4,
+             BWL1, BWL2, BWL3, BWL4) = ps.read_from_file(
+                config_file=args.run[0] + '.txt')
+
+            ps.openScope(ch1, ch2, ch3, ch4, trigger, coupling, vR1, vR2, vR3,
+                         vR4,
+                         enabled1, enabled2, enabled3, enabled4, BWL1, BWL2,
+                         BWL3,
+                         BWL4, duration, sampleInterval, n_captures)
+            print("Done")
         except:
             print("Error!")
     elif args.x != False:
