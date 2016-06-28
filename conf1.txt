@@ -1,7 +1,7 @@
 2E-6
 200E-12
 TriggerAux
-1000
+10
 0.2
 4
 2
@@ -20,6 +20,6 @@ True
 False
 False
 0
-0
+2
 0
 0

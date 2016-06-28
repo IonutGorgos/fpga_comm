@@ -4,51 +4,44 @@ from ciphertext import *
 from sasebo_ftdi import *
 from cnc_cmd import *
 from picocmd import *
-
+import struct
+from array import array
 def run_crypto():
-    time.sleep(1)
     hw = sasebo_ftdi.SASEBO()
-    with open('key.raw', 'wb'):
+    with open('simdata', 'wb'):
         pass
     hw.open()
+    num_traces = 10
+    f = open('simdata', 'ab')
+    m = struct.pack('I', num_traces)
+    f.write(m)
     rand = Random.new()
-    data = PICO().read_from_file("conf1.txt")
-    num_trace = data[7]
-    # key = bytearray(rand.getrandbits(8) for _ in xrange(16))
     key = rand.read(16)
-    # print "Key                   : " , binascii.hexlify(key).upper()
-
     # Initialization
-
+    key2 = array('B', key)
+    print "Cheie: ", key2
+    f = open('simdata', 'ab')
+    s = struct.pack('B' * len(key2), *key2)
+    f.write(s)
+    f.close()
     hw.setKey(key, 16)  # Hardware setKey
-    sw = AES.new(key, AES.MODE_ECB)  # Software SetKey
-
-    # num_trace = args.num_traces
-
     i = 1
-
-    while i <= num_trace:
-        # progress = (100.0 * i / num_trace)
-        # print "Trace nr. : ", i, "         Progress : ", progress, "%"
+    while i <= 10:
         text_in = rand.read(16)
-        # print "Plain text            : ", binascii.hexlify(text_in).upper()
-
-        text_ans = sw.encrypt(text_in)  # Ciphertext from Crypto.AES
-        # print "Cipher text(Software) : ", binascii.hexlify(text_ans).upper()
-
+        text = array('B', text_in)
+        print "Text" + str(i), text
+        f = open('simdata', 'ab')
+        t = struct.pack('B' * len(text), *text)
+        f.write(t)
+        f.close()
         text_out = bytearray(16)
-
         hw.writeText(text_in, 16)
         hw.execute()
-        bytes = hw.readText(text_out, 16)  # Ciphertext from SASEBO
-
-        # print "Cipher text(Hardware) : ", binascii.hexlify(bytes).upper()
-
-        i = i + 1
-
+        hw.readText(text_out, 16)  # Ciphertext from SASEBO
+        i += 1
     print "Key                   : ", binascii.hexlify(key).upper()
     hw.close()
-
+    return True
 
 def main():
     # Command line tool
@@ -148,6 +141,20 @@ def main():
                          enabled1, enabled2, enabled3, enabled4, BWL1, BWL2,
                          BWL3,
                          BWL4, duration, sampleInterval, n_captures)
+
+            ps.armMeasure(pre_trig)
+
+            print("Waiting for trigger")
+            run_crypto()
+            print ps.isReady()
+            ps.waitReady()
+            print ("Sampling Done")
+            print ps.isReady()
+            (data, numSamples, ov) = ps.getValues(ch2, values, mode)
+            Time = np.arange(numSamples) * sampleInterval
+            scipy.io.savemat(filename,
+                             mdict={'Time': Time, 'data': data,
+                                    'numSamples': numSamples})
             print("Done")
         except:
             print("Error!")

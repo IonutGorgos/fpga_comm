@@ -74,6 +74,12 @@ class PICO:
     def waitReady(self):
         self.ps.waitReady()
 
+    def getValues(self, chNum, values, mode):
+        (data, numSamples, ov) = self.ps.getDataRawBulk(channel=chNum,
+                                                        downSampleRatio=values,
+                                                        downSampleMode=mode)
+        return (data, numSamples, ov)
+
     def read_from_file(self, config_file):
         file = open(config_file, "r")
         data = file.readlines()
