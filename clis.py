@@ -6,30 +6,29 @@ from cnc_cmd import *
 from picocmd import *
 import struct
 from array import array
-def run_crypto():
+
+
+def run_crypto(key):
     hw = sasebo_ftdi.SASEBO()
-    with open('simdata', 'wb'):
-        pass
     hw.open()
-    num_traces = 10
-    f = open('simdata', 'ab')
-    m = struct.pack('I', num_traces)
-    f.write(m)
+    # f = open('simdata', 'ab')
+    # m = struct.pack('I', num_traces)
+    # f.write(m)
     rand = Random.new()
-    key = rand.read(16)
+    # key = rand.read(16)
     # Initialization
-    key2 = array('B', key)
-    print "Cheie: ", key2
-    f = open('simdata', 'ab')
-    s = struct.pack('B' * len(key2), *key2)
-    f.write(s)
-    f.close()
+    # key2 = array('B', key)
+    # print "Cheie: ", key2
+    # f = open('simdata', 'ab')
+    # s = struct.pack('B' * len(key2), *key2)
+    # f.write(s)
+    # f.close()
     hw.setKey(key, 16)  # Hardware setKey
     i = 1
-    while i <= 10:
+    while i <= 5:
         text_in = rand.read(16)
         text = array('B', text_in)
-        print "Text" + str(i), text
+        # print "Text" + str(i), text
         f = open('simdata', 'ab')
         t = struct.pack('B' * len(text), *text)
         f.write(t)
@@ -42,6 +41,21 @@ def run_crypto():
     print "Key                   : ", binascii.hexlify(key).upper()
     hw.close()
     return True
+
+
+def same_key(key):
+    # rand = Random.new()
+    # key = rand.read(16)
+    # Initialization
+
+    key2 = array('B', key)
+    print "Cheie: ", key2
+    f = open('simdata', 'ab')
+    s = struct.pack('B' * len(key2), *key2)
+    f.write(s)
+    f.close()
+    return key
+
 
 def main():
     # Command line tool
@@ -104,8 +118,6 @@ def main():
     cnc = CncComm()
     cnc.open_port(port)
 
-    # run_crypto("conf1.txt")
-
     if args.calibrate == True:
         print ("Sending calibrate command...")
         try:
@@ -128,33 +140,51 @@ def main():
         print ("Capture data...")
         try:
             ps = pico.PICO()
+            with open('simdata', 'wb'):
+                pass
             print("Attempting to open Picoscope 6000...")
             (duration, sampleInterval, trigger, n_captures, pre_trig, values,
              mode, filename, ch1, ch2, ch3, ch4,
              coupling, vR1, vR2, vR3, vR4, enabled1, enabled2, enabled3,
              enabled4,
-             BWL1, BWL2, BWL3, BWL4) = ps.read_from_file(
+             BWL1, BWL2, BWL3, BWL4, canal, group, key) = ps.read_from_file(
                 config_file=args.run[0] + '.txt')
+
+            key = binascii.unhexlify(key)  # reconvert to binary
 
             ps.openScope(ch1, ch2, ch3, ch4, trigger, coupling, vR1, vR2, vR3,
                          vR4,
                          enabled1, enabled2, enabled3, enabled4, BWL1, BWL2,
                          BWL3,
                          BWL4, duration, sampleInterval, n_captures)
+            f = open('simdata', 'ab')
+            m = struct.pack('I', group * n_captures)
+            f.write(m)
+            f.close()
+            same_key(key)
 
-            ps.armMeasure(pre_trig)
+            j = 1
+            while j <= group:
+                ps.armMeasure(pre_trig)
 
-            print("Waiting for trigger")
-            run_crypto()
-            print ps.isReady()
-            ps.waitReady()
-            print ("Sampling Done")
-            print ps.isReady()
-            (data, numSamples, ov) = ps.getValues(ch2, values, mode)
-            Time = np.arange(numSamples) * sampleInterval
-            scipy.io.savemat(filename,
-                             mdict={'Time': Time, 'data': data,
-                                    'numSamples': numSamples})
+                print("Waiting for trigger")
+                run_crypto(key)
+                # print ps.isReady()
+                ps.waitReady()
+                print ("Sampling Done")
+                # print ps.isReady()
+                (data, numSamples, ov) = ps.getValues(canal, values,
+                                                      mode)  # de pe ce canal
+                # vreau sa fac citirea bufferului...momentan doar  de pe unul
+                # singur
+                print ("Saving data ...")
+                Time = np.arange(numSamples) * sampleInterval
+                scipy.io.savemat(filename + str(j),
+                                 mdict={'Time': Time, 'data': data,
+                                        'numSamples': numSamples})
+                j += 1
+            print("Attempting to close Picoscope 6000...")
+            ps.close()
             print("Done")
         except:
             print("Error!")
@@ -172,13 +202,6 @@ def main():
             print ("Done")
         except:
             print("Error!")
-
-
-
-            # retrieve_data(cnc, args.x[0], args.y[0])
-
-
-# run_crypto("conf1.txt")
 
 if __name__ == '__main__':
     main()

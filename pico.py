@@ -116,10 +116,16 @@ class PICO:
         BWL2 = int(data[22])
         BWL3 = int(data[23])
         BWL4 = int(data[24])
+        canal = data[25].split('\n')
+        canal = canal[0]
+        group = int(data[26])
+        key = data[27].split('\n')
+        key = key[0]
+
 
         return (
             duration, sampleInterval, trigger, n_captures, pre_trig, values,
             mode, filename, ch1, ch2, ch3, ch4,
             coupling, vR1, vR2, vR3, vR4, enabled1, enabled2, enabled3,
             enabled4, BWL1, BWL2,
-            BWL3, BWL4)
+            BWL3, BWL4, canal, group, key)

@@ -1,11 +1,11 @@
 2E-6
 200E-12
 TriggerAux
-10
+5
 0.2
-4
+16
 2
-mama
+traces/trace_
 A
 B
 C
@@ -23,3 +23,6 @@ False
 2
 0
 0
+B
+3
+000102030405060708090A0B0C0D0E0F
