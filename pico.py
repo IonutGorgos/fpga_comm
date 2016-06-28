@@ -68,6 +68,12 @@ class PICO:
                          mdict={'Time': Time, 'data': data,
                                 'numSamples': numSamples})
 
+    def isReady(self):
+        return self.ps.isReady()
+
+    def waitReady(self):
+        self.ps.waitReady()
+
     def read_from_file(self, config_file):
         file = open(config_file, "r")
         data = file.readlines()
