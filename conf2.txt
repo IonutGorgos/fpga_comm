@@ -1,0 +1,46 @@
+2E-6
+400E-12
+B
+0.0
+Falling
+100
+True
+10
+0.17
+16
+0
+test_
+A
+B
+C
+DC
+50E-3
+500E-3
+100E-3
+True
+True
+False
+2
+0
+2
+
+Hello,
+
+Actually I realised this is not what I want.
+
+What we need is to use the downsampling method from the API, so that we use the full sampling rate of the oscilloscope (e.g. 2.5GS/s for two channels, or 5GS/s for one channel) and then apply the hardware downsampling to increase the resolution of the data we obtain.
+
+For example, if we want to use 10-bit resolution then we expect to obtain 2.5/16 ~ 156 MS/s after the downsample. However, these sampes are high-res, i.e. they come from averaging each 16 real sample at full sampling rate into one returned high-res sample.
+
+We are not sure if the PicoScope software does this when using the High-res feature or just a moving average, but from the API documentation it seems possible. In particular, it is clearly mentioned in this page:
+https://www.picotech.com/library/oscilloscopes/resolution-enhancement
+
+the following paragraph:
+"Consider a PicoScope 6404 oscilloscope with a 500 MHz bandwidth and 5 GS/s sampling rate.  If you enable 2 bits of resolution enhancement the effective sampling rate is reduced from 5 GS/s to 312.5 MS/s.  The current sampling rate and level of resolution enhancement are displayed in the properties pane and it is advisable to check these when using the feature."
+
+We are using precisely a 6404D oscilloscope. However, in the properties pane, when using the resolution enhancement, the effective sampling rate is not shown. Instead, we always see the same full sampling rate of 2.5GS/s for two channels. Furthermore, from the properties pane and from the returned waveform, it is clear that the total number of samples has not decreased, i.e. we still get 5000 samples in our case (400ps sampling interval, 2us total interval), even after using 10-bit resolution enhancement. This is not as expected and is not what it says on the webpage mentioned above. See the attached images, where for both 8-bit resolution or 10-bit resolution enhancement we get the same sampling rate and the same number of samples.
+
+Could you please clarify this issue? That is, how to use the resolution enhancement method presented in the webpage? 
+
+
+In any case, we would like to use the resolution-enhancement feature as shown in the page mentioned above. Is this possible ?

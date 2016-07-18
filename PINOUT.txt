@@ -26,7 +26,8 @@ $120 = 4		mm/sec^2
 $121 = 4
 $122 = 4
 
-Y = 80		home_Y
-X = 0     	home_X
-28.4cm pe X
-sau 28 cm pe X
+
+
+X = 28 cm  pentru 0
+
+Y = 20 cm pt 84

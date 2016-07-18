@@ -1,7 +1,7 @@
 2E-6
 200E-12
 TriggerAux
-10000
+100
 0.2
 16
 2
@@ -15,14 +15,14 @@ DC
 50E-3
 100E-3
 100E-3
-False
 True
 False
 False
+False
+2
 0
 0
 0
-0
-B
-50
+A
+10
 c860a52c10aca58777895919d7e1383c

@@ -87,7 +87,6 @@ class CncComm:
         move = "G00 Y" + str(yValue)
         a = time.time()  # to measure time elapsed
         self.ser.write(move + '\n')
-
         grbl_out = self.ser.readline()
         time.sleep(abs(yValue) / 2)
         print 'Y : ' + str(yValue) + " = " + grbl_out.strip()
@@ -98,7 +97,7 @@ class CncComm:
         return self.y
 
     def go_home(self):
-        r = -76
+        r = -84
         self.ser.write("\r\n\r\n")
         time.sleep(2)
         self.ser.flushInput()

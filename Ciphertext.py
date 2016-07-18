@@ -42,21 +42,21 @@ def main():
     num_trace = args.num_traces
     i = 1
     while i <= num_trace:
-        progress = (100.0 * i / num_trace)
-        print
-        print "Trace nr. : ", i, "         Progress : ", progress, "%"
+        # progress = (100.0 * i / num_trace)
+        # print
+        # print "Trace nr. : ", i, "         Progress : ", progress, "%"
         text_in = rand.read(16)
-        print "Plain text            : ", binascii.hexlify(text_in).upper()
+        # print "Plain text            : ", binascii.hexlify(text_in).upper()
 
         text_ans = sw.encrypt(text_in)  # Ciphertext from Crypto.AES
-        print "Cipher text(Software) : ", binascii.hexlify(text_ans).upper()
+        # print "Cipher text(Software) : ", binascii.hexlify(text_ans).upper()
 
         text_out = bytearray(16)
 
         hw.writeText(text_in, 16)
         hw.execute()
         bytes = hw.readText(text_out, 16)  # Ciphertext from SASEBO
-        print "Cipher text(Hardware) : ", binascii.hexlify(bytes).upper()
+        # print "Cipher text(Hardware) : ", binascii.hexlify(bytes).upper()
 
         i = i + 1
     print "Key                   : ", binascii.hexlify(key).upper()
