@@ -13,23 +13,23 @@ class PICO:
 
     def openScope(self, chNum1, chNum2,
                   chNum3, chNum4, trgSrc, chCoupling, chVRange1, chVRange2,
-                  chVRange3, chVRange4, enabled1,
+                  chVRange3, chVRange4, chVOffset1, chVOffset2,chVOffset3,chVOffset4, enabled1,
                   enabled2, enabled3, enabled4,
                   BWLimited1, BWLimited2, BWLimited3, BWLimited4, duration,
                   sampleInterval, n_captures):
         self.ps.open()
 
         self.channel(chNum=chNum1, chCoupling=chCoupling,
-                     chVRange=chVRange1, enabled=enabled1,
+                     chVRange=chVRange1, chVOffset = chVOffset1, enabled=enabled1,
                      BWLimited=BWLimited1)
         self.channel(chNum=chNum2, chCoupling=chCoupling,
-                     chVRange=chVRange2, enabled=enabled2,
+                     chVRange=chVRange2, chVOffset = chVOffset2, enabled=enabled2,
                      BWLimited=BWLimited2)
         self.channel(chNum=chNum3, chCoupling=chCoupling,
-                     chVRange=chVRange3, enabled=enabled3,
+                     chVRange=chVRange3, chVOffset = chVOffset3, enabled=enabled3,
                      BWLimited=BWLimited3)
         self.channel(chNum=chNum4, chCoupling=chCoupling,
-                     chVRange=chVRange4, enabled=enabled4,
+                     chVRange=chVRange4, chVOffset = chVOffset4, enabled=enabled4,
                      BWLimited=BWLimited4)
 
         self.duration = duration
@@ -47,9 +47,9 @@ class PICO:
     def close(self):
         self.ps.close()
 
-    def channel(self, chNum, chCoupling, chVRange, enabled, BWLimited):
+    def channel(self, chNum, chCoupling, chVRange, chVOffset, enabled, BWLimited):
         channel = self.ps.setChannel(channel=chNum, coupling=chCoupling,
-                                     VRange=chVRange, enabled=enabled,
+                                     VRange=chVRange,VOffset=chVOffset, enabled=enabled,
                                      BWLimited=BWLimited)
 
     def armMeasure(self, pretrig):
@@ -121,11 +121,16 @@ class PICO:
         group = int(data[26])
         key = data[27].split('\n')
         key = key[0]
+        vOffset1 = float(data[28])
+        vOffset2 = float(data[29])
+        vOffset3 = float(data[30])
+        vOffset4 = float(data[31])
+
 
 
         return (
             duration, sampleInterval, trigger, n_captures, pre_trig, values,
             mode, filename, ch1, ch2, ch3, ch4,
-            coupling, vR1, vR2, vR3, vR4, enabled1, enabled2, enabled3,
+            coupling, vR1, vR2, vR3, vR4, vOffset1, vOffset2, vOffset3, vOffset4, enabled1, enabled2, enabled3,
             enabled4, BWL1, BWL2,
             BWL3, BWL4, canal, group, key)

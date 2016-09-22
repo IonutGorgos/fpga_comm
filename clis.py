@@ -25,11 +25,16 @@ def run_crypto(key, n_captures):
         f = open('realdata', 'ab')
         t = struct.pack('B' * len(text), *text)
         f.write(t)
-        f.close()
         text_out = bytearray(16)
         hw.writeText(text_in, 16)
         hw.execute()
-        hw.readText(text_out, 16)  # Ciphertext from SASEBO
+        ctext = hw.readText(text_out, 16)  # Ciphertext from SASEBO
+        #print "PlainTEXT                   : ", binascii.hexlify(text_in).upper()
+        #print "CipherTEXT                   : ", binascii.hexlify(ctext).upper()
+        cbtext = array('B', ctext)
+        c = struct.pack('B' * len(cbtext), *cbtext)
+        f.write(c)
+        f.close()
         i += 1
     print "Key                   : ", binascii.hexlify(key).upper()
     hw.close()
@@ -134,7 +139,7 @@ def main():
             print("Attempting to open Picoscope 6000...")
             (duration, sampleInterval, trigger, n_captures, pre_trig, values,
              mode, filename, ch1, ch2, ch3, ch4,
-             coupling, vR1, vR2, vR3, vR4, enabled1, enabled2, enabled3,
+             coupling, vR1, vR2, vR3, vR4, vo1,vo2,vo3,vo4, enabled1, enabled2, enabled3,
              enabled4,
              BWL1, BWL2, BWL3, BWL4, canal, group, key) = ps.read_from_file(
                 config_file=args.run[0] + '.txt')
@@ -142,10 +147,10 @@ def main():
             key = binascii.unhexlify(key)  # reconvert to binary
 
             ps.openScope(ch1, ch2, ch3, ch4, trigger, coupling, vR1, vR2, vR3,
-                         vR4,
+                         vR4,vo1,vo2,vo3,vo4,
                          enabled1, enabled2, enabled3, enabled4, BWL1, BWL2,
                          BWL3,
-                         BWL4, duration, sampleInterval, n_captures)
+                         BWL4, duration, sampleInterval, n_captures)  # Voffset added
             f = open('realdata', 'ab')
             m = struct.pack('I', group * n_captures)
             f.write(m)
