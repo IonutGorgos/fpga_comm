@@ -1,8 +1,8 @@
-clis.py script for controlling the experimental platform for Sasebo-G written in Python 2.7
+### FPGA, Picoscope, CNC communication
+
+clis.py script for controlling the experimental platform for Sasebo-G written in Python 2.7/ Python 3.6
 
 Libusb-win32 driver used for Windows
 
-FT245RL_linux under development
-
-Copyright (c) 2016  Ionut Gorgos (ionutgorgos@gmail.com)
+Copyright (c) 2017  Ionut Gorgos (ionutgorgos@gmail.com)
 All rights reserved.

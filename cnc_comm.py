@@ -52,10 +52,10 @@ class CncComm:
         # Stream g-code to grbl
         for line in f:
             l = line.strip()
-            print 'Sending: ' + l
+            print ('Sending: ' + l)
             self.ser.write(l + '\n')
             grbl_out = self.ser.readline()
-            print ' : ' + grbl_out.strip()
+            print (' : ' + grbl_out.strip())
 
         # raw_input("	Press <Enter> to exit and disable grbl.")
 
@@ -72,9 +72,9 @@ class CncComm:
         self.ser.write(move + '\n')
         grbl_out = self.ser.readline()
         time.sleep(abs(xValue) / 2)
-        print 'X : ' + str(xValue) + " = " + grbl_out.strip()
+        print ('X : ' + str(xValue) + " = " + grbl_out.strip())
         elapsed = time.time() - a  # to measure time elapsed
-        print 'Time elapsed: ', elapsed, 'sec'  # to measure time elapsed
+        print ('Time elapsed: ', elapsed, 'sec')  # to measure time elapsed
         # self.ser.close()
         self.x = self.x + xValue
         return self.x
@@ -89,9 +89,9 @@ class CncComm:
         self.ser.write(move + '\n')
         grbl_out = self.ser.readline()
         time.sleep(abs(yValue) / 2)
-        print 'Y : ' + str(yValue) + " = " + grbl_out.strip()
+        print ('Y : ' + str(yValue) + " = " + grbl_out.strip())
         elapsed = time.time() - a  # to measure time elapsed
-        print 'Time elapsed: ', elapsed, 'sec'  # to measure time elapsed
+        print ('Time elapsed: ', elapsed, 'sec')  # to measure time elapsed
         # self.ser.close()
         self.y = self.y + yValue
         return self.y

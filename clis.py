@@ -29,21 +29,19 @@ def run_crypto(key, n_captures):
         hw.writeText(text_in, 16)
         hw.execute()
         ctext = hw.readText(text_out, 16)  # Ciphertext from SASEBO
-        #print "PlainTEXT                   : ", binascii.hexlify(text_in).upper()
-        #print "CipherTEXT                   : ", binascii.hexlify(ctext).upper()
         cbtext = array('B', ctext)
         c = struct.pack('B' * len(cbtext), *cbtext)
         f.write(c)
         f.close()
         i += 1
-    print "Key                   : ", binascii.hexlify(key).upper()
+    print ("Key                   : ", binascii.hexlify(key).decode('utf-8').upper())
     hw.close()
     return True
 
 
 def same_key(key):
     key2 = array('B', key)
-    print "Cheie: ", key2
+    print ("Cheie: ", key2)
     f = open('realdata', 'ab')
     s = struct.pack('B' * len(key2), *key2)
     f.write(s)
@@ -146,9 +144,9 @@ def main():
             key = binascii.unhexlify(key)  # reconvert to binary
 
             ps.openScope(ch1, ch2, ch3, ch4, trigger, coupling, vR1, vR2, vR3,
-                         vR4, enabled1, enabled2, enabled3, enabled4, BWL1, BWL2,
-                         BWL3,
-                         BWL4, duration, sampleInterval, n_captures)  # Voffset added
+                         vR4, enabled1, enabled2, enabled3, enabled4, BWL1, BWL2, 
+                         BWL3, BWL4, duration, sampleInterval, n_captures) 
+
             f = open('realdata', 'ab')
             m = struct.pack('I', group * n_captures)
             f.write(m)
@@ -158,17 +156,11 @@ def main():
             j = 1
             while j <= group:
                 ps.armMeasure(pre_trig)
-                #time.sleep(0.5)
                 print("Waiting for trigger")
                 run_crypto(key, n_captures)
                 ps.waitReady()
-                # print ps.isReady()
                 print ("Sampling Done")
-                # print ps.isReady()
-                (data, numSamples, ov) = ps.getValues(canal, values,
-                                                      mode)  # de pe ce canal
-                # vreau sa fac citirea bufferului...momentan doar  de pe unul
-                # singur
+                (data, numSamples, ov) = ps.getValues(canal, values, mode)  
                 print ("Saving data ...")
                 Time = np.arange(numSamples) * sampleInterval
                 scipy.io.savemat(filename + str(j),
@@ -203,8 +195,8 @@ def main():
                 x = float(l[0])
                 y = float(l[1])
                 # print x, y
-                print l[0]
-                print l[1]
+                print (l[0])
+                print (l[1])
                 retrieve_data(cnc, x, y)
                 time.sleep(0.1)
                 ps = pico.PICO()
