@@ -1,5 +1,5 @@
 __author__ = "Ionut Gorgos"
-__copyright__ = "Copyright (C) 2016 Ionut Gorgos"
+__copyright__ = "Copyright (C) 2017 Ionut Gorgos"
 __license__ = "Public Domain"
 __version__ = "1.0"
 
@@ -64,7 +64,6 @@ class SASEBO:
 
     # -------------------------------------------------------------- readText()
     def readText(self, text, len):
-        #self.readBurst(self.ADDR_OTEXT0, text, len)
         return self.readBurst(self.ADDR_OTEXT0, text, len)
 
     # ----------------------------------------------------------------execute()
@@ -99,26 +98,23 @@ class SASEBO:
 
     def writeBurst(self, addr, data, len):
         #buf = array.array('B', [0] * (5 * len / 2))
-        buf = bytearray(5 * len / 2)
-        for i in range(len / 2):
+        buf = bytearray(5 * len // 2)
+        for i in range(len // 2):
             buf[i * 5 + 0] = 0x01
             buf[i * 5 + 1] = (((addr + i * 2) >> 8) & 0xFF)
             buf[i * 5 + 2] = (((addr + i * 2)) & 0xFF)
             buf[i * 5 + 3] = data[i * 2]
             buf[i * 5 + 4] = data[i * 2 + 1]
         #print binascii.hexlify(data).upper()  # testing
-        self.port.write(buf, 5 * (len / 2))
+        self.port.write(buf, 5 * (len // 2))
 
     # ------------------------------------------------------------- readBurst()
     def readBurst(self, addr, data, len):
         #buf = array.array('B', [0] * (3 * len / 2))
-        buf = bytearray(3 * len / 2)
-        for i in range(len / 2):
+        buf = bytearray(3 * len // 2)           # change to // to round to integer
+        for i in range(len // 2):
             buf[i * 3 + 0] = 0x00
             buf[i * 3 + 1] = (((addr + i * 2) >> 8) & 0xFF)
             buf[i * 3 + 2] = (((addr + i * 2)) & 0xFF)
-        #print binascii.b2a_hex(buf).upper()  # testing
-        #print binascii.b2a_hex(data).upper()  # testing
-        self.port.write(buf, 3 * (len / 2))
-        #self.port.read(data, len)
+        self.port.write(buf, 3 * (len // 2))
         return self.port.read(data, len)

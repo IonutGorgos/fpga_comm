@@ -1,5 +1,5 @@
 __author__ = "Ionut Gorgos"
-__copyright__ = "Copyright (C) 2016 Ionut Gorgos"
+__copyright__ = "Copyright (C) 2017 Ionut Gorgos"
 __license__ = "Public Domain"
 __version__ = "1.0"
 
@@ -7,7 +7,6 @@ __version__ = "1.0"
 
 import pyftdi.ftdi
 import pyftdi.bits
-import pyftdi.spi
 import pyftdi.usbtools
 import time
 
@@ -16,8 +15,8 @@ class FTDI_USB:
         self.device = pyftdi.ftdi.Ftdi()
 
     def open(self):
-        #self.device.open(vendor=0x0403, product=0x6001, interface=0)
-        self.device.open_from_url("ftdi:///?")
+        self.device.open(vendor=0x0403, product=0x6001, interface=0)
+        #self.device.open_from_url('ftdi://ftdi:232:A9003wY0/1')
 
     # ------------------------------------------------------------------Close()
     def close(self):
@@ -25,12 +24,9 @@ class FTDI_USB:
 
     # -------------------------------------------------------------------Read()
     def read(self, data, len):
-        bytes = self.device.read_data(data)
-        # print binascii.hexlify(bytes).upper()     # testing
-        # time.sleep(0.1)
+        bytes = self.device.read_data(len)
         return bytes
 
     # ------------------------------------------------------------------Write()
     def write(self, data, len):
         self.device.write_data(data)
-        # time.sleep(0.5)
