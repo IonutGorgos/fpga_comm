@@ -8,16 +8,14 @@ import ast
 
 class PICO:
     def __init__(self):
-        self.nSamples = 0
-        self.ps = ps6000.PS6000(connect=False)
+        self.ps = ps6000.PS6000(connect=True)
 
-    def openScope(self, chNum1, chNum2,
+    def initialize(self, chNum1, chNum2,
                   chNum3, chNum4, trgSrc, chCoupling, chVRange1, chVRange2,
                   chVRange3, chVRange4, enabled1,
                   enabled2, enabled3, enabled4,
                   BWLimited1, BWLimited2, BWLimited3, BWLimited4, duration,
-                  sampleInterval, n_captures):
-        self.ps.open()
+                  sampleInterval):
         self.channel(chNum=chNum1, chCoupling=chCoupling,
                      chVRange=chVRange1, enabled=enabled1,
                      BWLimited=BWLimited1)
@@ -33,28 +31,27 @@ class PICO:
 
         self.duration = duration
         self.sampleInterval = sampleInterval
-        self.n_captures = n_captures
-        samples_per_segment = self.ps.memorySegments(self.n_captures)
-        self.ps.setNoOfCaptures(self.n_captures)
         (actualSamplingInterval, self.nSamples,
          maxSamples) = self.ps.setSamplingInterval(self.sampleInterval,
                                                    self.duration)
         
         print ("Sampling Rate @ %.2f GS/s" % (1 / self.sampleInterval * 1E-9))
 
-        self.ps.setSimpleTrigger(trigSrc=trgSrc)
+        self.ps.setSimpleTrigger(trigSrc=trgSrc, timeout_ms=100)   
+        # Primii 4 pasi
 
     def close(self):
         self.ps.close()
+
+    def stop(self):
+        self.ps.stop()
 
     def channel(self, chNum, chCoupling, chVRange, enabled, BWLimited):
         channel = self.ps.setChannel(channel=chNum, coupling=chCoupling,
                                      VRange=chVRange, enabled=enabled,
                                      BWLimited=BWLimited)
         
-
-
-    def armMeasure(self, pretrig):
+    def runBlock(self, pretrig):        # Pas 5
         self.ps.runBlock(pretrig=pretrig)
 
     def measure(self, chNum, values, mode, filename):
@@ -73,14 +70,15 @@ class PICO:
     def isReady(self):
         return self.ps.isReady()
 
-    def waitReady(self):
+    def waitReady(self):        # Pas 6
         self.ps.waitReady()
 
-    def getValues(self, chNum, values, mode):
-        (data, numSamples, ov) = self.ps.getDataRawBulk(channel=chNum,
+    def getValues(self, chNum, values, mode, trim):
+        (data, numSamples, ov) = self.ps.getDataRaw(channel=chNum,
                                                         downSampleRatio=values,
                                                         downSampleMode=mode)
-        return (data, numSamples, ov)
+        data = data[0:trim]
+        return (data, numSamples, ov)           # Pas 7 si 8
 
     def read_from_file(self, config_file):
         file = open(config_file, "r")
@@ -90,7 +88,7 @@ class PICO:
         sampleInterval = float(data[1])
         trigger = data[2].split('\n')
         trigger = trigger[0]
-        n_captures = int(data[3])
+        n_captures = int(data[3])      # removed in future
         pre_trig = float(data[4])
         values = int(data[5])
         mode = int(data[6])

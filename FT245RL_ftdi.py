@@ -9,13 +9,14 @@ import pyftdi.ftdi
 import pyftdi.bits
 import pyftdi.usbtools
 import time
+import binascii
 
 class FTDI_USB:
     def __init__(self):
         self.device = pyftdi.ftdi.Ftdi()
 
     def open(self):
-        self.device.open(vendor=0x0403, product=0x6001, interface=1)
+        self.device.open(vendor=0x0403, product=0x6001, interface=0)
         #self.device.open_from_url('ftdi://ftdi:232:A9003wY0/1')
 
     # ------------------------------------------------------------------Close()
